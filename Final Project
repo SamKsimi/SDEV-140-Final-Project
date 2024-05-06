@@ -1,0 +1,97 @@
+"""
+Sam Ksimi
+SDEV 140
+May 5th, 2024
+
+The purpose of this project is to create a product management system that can create, update and delete products as needed. 
+While I do have the program functioning to create products and view them, I still haven't coded the program to update and delete products after they're made. Currently I just have it set to where the user can add in products.
+"""
+
+# import tkinter and abbreviate it as "tk" while messagebox is imported for displaying message boxes
+import tkinter as tk
+from tkinter import messagebox
+
+# I created the class ProductManagerApp and used the __init__ method. From here I start creating labels and buttons in the main frame, and the buttons "Add product" and "View product" can be seen by the user
+class ProductManagerApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Knobstopper Product Manager")
+        self.master.geometry("400x300")
+
+        self.product_list = []
+
+        self.main_frame = tk.Frame(self.master)
+        self.main_frame.pack(pady=20)
+
+        self.label_title = tk.Label(self.main_frame, text="Product Manager", font=("Helvetica", 16))
+        self.label_title.pack(pady=10)
+
+        self.button_add_product = tk.Button(self.main_frame, text="Add Product", command=self.add_product_window)
+        self.button_add_product.pack(pady=10)
+
+        self.button_view_products = tk.Button(self.main_frame, text="View Products", command=self.view_products)
+        self.button_view_products.pack(pady=10)
+
+        self.button_exit = tk.Button(self.main_frame, text="Exit", command=self.master.destroy)
+        self.button_exit.pack(pady=10)
+
+# this creates a new window for adding the product
+    def add_product_window(self):
+        self.add_product_window = tk.Toplevel(self.master)
+        self.add_product_window.title("Add Product")
+        self.add_product_window.geometry("300x200")
+
+        self.label_name = tk.Label(self.add_product_window, text="Product Name:")
+        self.label_name.pack(pady=5)
+        self.entry_name = tk.Entry(self.add_product_window)
+        self.entry_name.pack(pady=5)
+
+        self.label_price = tk.Label(self.add_product_window, text="Product Price:")
+        self.label_price.pack(pady=5)
+        self.entry_price = tk.Entry(self.add_product_window)
+        self.entry_price.pack(pady=5)
+
+        self.button_add = tk.Button(self.add_product_window, text="Add", command=self.add_product)
+        self.button_add.pack(pady=10)
+
+# After the user inputs the product information such as the name and price, the program will prompt a success message and the product is added to the list
+    def add_product(self):
+        name = self.entry_name.get()
+        price = self.entry_price.get()
+
+        if not name or not price:
+            messagebox.showerror("Error", "Please enter both name and price.")
+            return
+
+        try:
+            price = float(price)
+        except ValueError:
+            messagebox.showerror("Error", "Price must be a number.")
+            return
+
+        self.product_list.append({"name": name, "price": price})
+        messagebox.showinfo("Success", "Product added successfully.")
+        self.add_product_window.destroy()
+
+# this will create a new window in viewing the products that have already been made. In the future I plan on changing the coding so that products can also be updated or deleted
+    def view_products(self):
+        self.view_products_window = tk.Toplevel(self.master)
+        self.view_products_window.title("View Products")
+        self.view_products_window.geometry("300x200")
+
+        if not self.product_list:
+            label_empty = tk.Label(self.view_products_window, text="No products available.")
+            label_empty.pack(pady=10)
+            return
+
+        for product in self.product_list:
+            label_product = tk.Label(self.view_products_window, text=f"{product['name']} - ${product['price']:.2f}")
+            label_product.pack(pady=5)
+# this will start the application
+def main():
+    root = tk.Tk()
+    app = ProductManagerApp(root)
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
