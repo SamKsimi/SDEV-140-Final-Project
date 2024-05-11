@@ -1,17 +1,19 @@
 """
 Sam Ksimi
 SDEV 140
-May 5th, 2024
+May 10th, 2024
 
-The purpose of this project is to create a product management system that can create, update and delete products as needed. 
-While I do have the program functioning to create products and view them, I still haven't coded the program to update and delete products after they're made. Currently I just have it set to where the user can add in products.
+The purpose of this project is to create a product management system that can create, update and delete products.
+After making several changes to this code, the program can now also add, delete, and update users in the Manage Users window.
 """
 
 # import tkinter and abbreviate it as "tk" while messagebox is imported for displaying message boxes
 import tkinter as tk
 from tkinter import messagebox
 
-# I created the class ProductManagerApp and used the __init__ method. From here I start creating labels and buttons in the main frame, and the buttons "Add product" and "View product" can be seen by the user
+# I created the class ProductManagerApp and used the __init__ method.
+# From here I start creating labels and buttons in the main frame, and the buttons "Add product" and "View product" can be seen by the user
+# I've also added in a button to manage users which can both add an update users. The default username is Admin and default password is "Password"
 class ProductManagerApp:
     def __init__(self, master):
         self.master = master
@@ -19,6 +21,7 @@ class ProductManagerApp:
         self.master.geometry("400x300")
 
         self.product_list = []
+        self.user_list = [{"username": "admin", "password": "admin"}] 
 
         self.main_frame = tk.Frame(self.master)
         self.main_frame.pack(pady=20)
@@ -32,10 +35,13 @@ class ProductManagerApp:
         self.button_view_products = tk.Button(self.main_frame, text="View Products", command=self.view_products)
         self.button_view_products.pack(pady=10)
 
+        self.button_manage_users = tk.Button(self.main_frame, text="Manage Users", command=self.manage_users_window)
+        self.button_manage_users.pack(pady=10)
+
         self.button_exit = tk.Button(self.main_frame, text="Exit", command=self.master.destroy)
         self.button_exit.pack(pady=10)
 
-# this creates a new window for adding the product
+# This creates a new window for adding the product
     def add_product_window(self):
         self.add_product_window = tk.Toplevel(self.master)
         self.add_product_window.title("Add Product")
@@ -73,7 +79,7 @@ class ProductManagerApp:
         messagebox.showinfo("Success", "Product added successfully.")
         self.add_product_window.destroy()
 
-# this will create a new window in viewing the products that have already been made. In the future I plan on changing the coding so that products can also be updated or deleted
+# This will create a new window in viewing the products that have already been made.
     def view_products(self):
         self.view_products_window = tk.Toplevel(self.master)
         self.view_products_window.title("View Products")
@@ -87,11 +93,83 @@ class ProductManagerApp:
         for product in self.product_list:
             label_product = tk.Label(self.view_products_window, text=f"{product['name']} - ${product['price']:.2f}")
             label_product.pack(pady=5)
-# this will start the application
+
+# This will open up the manage users window
+    def manage_users_window(self):
+        self.manage_users_window = tk.Toplevel(self.master)
+        self.manage_users_window.title("Manage Users")
+        self.manage_users_window.geometry("300x200")
+
+        self.label_username = tk.Label(self.manage_users_window, text="Username:")
+        self.label_username.pack(pady=5)
+        self.entry_username = tk.Entry(self.manage_users_window)
+        self.entry_username.pack(pady=5)
+
+        self.label_password = tk.Label(self.manage_users_window, text="Password:")
+        self.label_password.pack(pady=5)
+        self.entry_password = tk.Entry(self.manage_users_window, show="*")
+        self.entry_password.pack(pady=5)
+
+        self.button_add_user = tk.Button(self.manage_users_window, text="Add User", command=self.add_user)
+        self.button_add_user.pack(pady=5)
+
+        self.button_update_user = tk.Button(self.manage_users_window, text="Update User", command=self.update_user)
+        self.button_update_user.pack(pady=5)
+
+        self.button_delete_user = tk.Button(self.manage_users_window, text="Delete User", command=self.delete_user)
+        self.button_delete_user.pack(pady=5)
+
+# In the Manage Users window, this will allow for adding users
+    def add_user(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+
+        if not username or not password:
+            messagebox.showerror("Error", "Please enter both username and password.")
+            return
+
+        self.user_list.append({"username": username, "password": password})
+        messagebox.showinfo("Success", "User added successfully.")
+
+# In the Manage Users window, this will allow for updating existing users
+    def update_user(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+
+        if not username or not password:
+            messagebox.showerror("Error", "Please enter both username and password.")
+            return
+
+        for user in self.user_list:
+            if user["username"] == username:
+                user["password"] = password
+                messagebox.showinfo("Success", "User updated successfully.")
+                return
+
+        messagebox.showerror("Error", "User not found.")
+
+# I've added a button in here that will delete users in the Manage Users window once they're created
+    def delete_user(self):
+        username = self.entry_username.get()
+
+        if not username:
+            messagebox.showerror("Error", "Please enter a username.")
+            return
+
+        for user in self.user_list:
+            if user["username"] == username:
+                self.user_list.remove(user)
+                messagebox.showinfo("Success", "User deleted successfully.")
+                return
+
+        messagebox.showerror("Error", "User not found.")
+
+# This will start the application
 def main():
     root = tk.Tk()
     app = ProductManagerApp(root)
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()
